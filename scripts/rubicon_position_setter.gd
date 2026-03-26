@@ -11,7 +11,7 @@ class_name RubiconPositionSetter extends Node
 
 @export_storage var current_point : StringName:
 	set(value):
-		if value == current_point or not point_map.has(current_point) or point_map[current_point] == null:
+		if value == current_point or not point_map.has(value) or point_map[value] == null:
 			return
 
 		current_point = value
@@ -57,6 +57,9 @@ func _get_property_list() -> Array[Dictionary]:
 var _camera_2d : RubiconInterpolatedCamera2D
 var _camera_3d : RubiconInterpolatedCamera3D
 
+func _init() -> void:
+	set_process_internal(true)
+
 func is_attached_to_2d_camera() -> bool:
 	return _camera_2d != null
 
@@ -74,6 +77,22 @@ func _notification(what : int) -> void:
 		NOTIFICATION_UNPARENTED:
 			_camera_2d = null
 			_camera_3d = null
+		NOTIFICATION_INTERNAL_PROCESS:
+			if not point_map.has(current_point) or point_map[current_point] == null:
+				return
+
+			var target : Node = point_map[current_point]
+			if set_position:
+				if is_attached_to_2d_camera():
+					_camera_2d.position_interpolate_target = _get_2d_global_position(target)
+				elif is_attached_to_3d_camera():
+					_camera_3d.position_interpolate_target = target.global_position
+			
+			if set_rotation:
+				if is_attached_to_2d_camera():
+					_camera_2d.rotation_interpolate_target = target.global_rotation
+				elif is_attached_to_3d_camera():
+					_camera_3d.basis_interpolate_target = target.global_basis
 
 ## This normally isn't needed, but [Parallax2D] does geniunely change the global position of nodes.
 func _get_2d_global_position(node : Node) -> Vector2:
@@ -84,7 +103,7 @@ func _get_2d_global_position(node : Node) -> Vector2:
 	var parent : Node = get_parent()
 	while parent != null:
 		global_pos += _get_node_2d_position(parent)
-		parent = get_parent()
+		parent = parent.get_parent()
 	
 	return global_pos
 	

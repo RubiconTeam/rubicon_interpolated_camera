@@ -21,9 +21,11 @@ class_name RubiconPositionSetter extends Node
 @export_storage var current_point : StringName:
 	set(value):
 		if value == current_point or not point_map.has(value) or point_map[value] == null:
+			set_process_internal(false)
 			return
 
 		current_point = value
+		set_process_internal(true)
 		notify_property_list_changed()
 
 		var target : Node = point_map[current_point]
@@ -74,8 +76,6 @@ func is_attached_to_3d_camera() -> bool:
 
 func _notification(what : int) -> void:
 	match what:
-		NOTIFICATION_POSTINITIALIZE:
-			set_process_internal(true)
 		NOTIFICATION_PARENTED:
 			var parent : Node = get_parent()
 			if parent is RubiconInterpolatedCamera2D:

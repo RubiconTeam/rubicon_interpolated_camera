@@ -21,12 +21,11 @@ class_name RubiconInterpolatedCamera2D extends Camera2D
 
 func _notification(what: int) -> void:
 	match what:
-		NOTIFICATION_POSTINITIALIZE:
-			set_process_internal(true)
 		NOTIFICATION_READY:
 			position_interpolate_target = global_position
 			rotation_interpolate_target = global_rotation
 			zoom_interpolate_target = zoom
+			set_process_internal(true)
 		NOTIFICATION_INTERNAL_PROCESS:
 			var delta : float = get_process_delta_time()
 			if position_interpolate_enabled:

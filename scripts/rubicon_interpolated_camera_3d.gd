@@ -21,13 +21,12 @@ class_name RubiconInterpolatedCamera3D extends Camera3D
 
 func _notification(what: int) -> void:
 	match what:
-		NOTIFICATION_POSTINITIALIZE:
-			set_process_internal(true)
 		NOTIFICATION_READY:
 			position_interpolate_target = global_position
 			basis_interpolate_target = global_basis
 			fov_interpolate_target = fov
-		NOTIFICATION_PROCESS:
+			set_process_internal(true)
+		NOTIFICATION_INTERNAL_PROCESS:
 			var delta : float = get_process_delta_time()
 			if position_interpolate_enabled:
 				global_position = global_position.lerp(position_interpolate_target + position_interpolate_offset, position_interpolate_speed * delta)

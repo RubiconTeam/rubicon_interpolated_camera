@@ -21,8 +21,10 @@ class_name RubiconPositionSetter extends Node
 @export_storage var current_point : StringName:
 	set(value):
 		if value == current_point or not point_map.has(value) or point_map[value] == null:
-			set_process_internal(false)
 			return
+
+			if value == null and not point_map.values()[0] == null:
+				value = point_map.values()[0]
 
 		current_point = value
 		set_process_internal(true)
@@ -56,12 +58,13 @@ func _get_property_list() -> Array[Dictionary]:
 		return []
 	
 	properties.append({
-		name = &"current_point",
+		name = &"_current_point",
 		hint = PROPERTY_HINT_ENUM,
 		type = TYPE_STRING_NAME,
 		usage = PROPERTY_USAGE_EDITOR,
 		hint_string = ",".join(points),
 	})
+
 	
 	return properties
 
@@ -126,3 +129,16 @@ func _get_node_2d_position(node : Node) -> Vector2:
 		return Vector2.ZERO
 	
 	return node.position
+
+func _get(property: StringName) -> Variant:
+	if property == &"_current_point":
+		return current_point
+
+	return null
+
+func _set(property: StringName, value: Variant) -> bool:
+	if property == &"_current_point":
+		current_point = value
+		return true
+
+	return false

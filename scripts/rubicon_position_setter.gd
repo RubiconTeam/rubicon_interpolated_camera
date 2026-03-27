@@ -1,8 +1,17 @@
 @tool
 class_name RubiconPositionSetter extends Node
 
-@export var set_position : bool = true
-@export var set_rotation : bool = true
+## Controls whether setting [current_point] will update the associated camera's position.
+@export var position_enabled : bool = true
+
+## Whether the camera should constantly follow a certain node's position. Disabling this may improve performance.
+@export var position_follow : bool = false
+
+## Controls whether setting [current_point] will update the associated camera's rotation.
+@export var rotation_enabled : bool = true
+
+## Whether the camera should constantly follow a certain node's rotation. Disabling this may improve performance.
+@export var rotation_follow : bool = false
 
 @export var point_map : Dictionary[StringName, Node] = {&"Opponent": null, &"Player": null}:
 	set(value):
@@ -19,16 +28,16 @@ class_name RubiconPositionSetter extends Node
 
 		var target : Node = point_map[current_point]
 		if is_attached_to_2d_camera():
-			if set_position:
+			if position_enabled:
 				_camera_2d.position_interpolate_target = _get_2d_global_position(target)
 			
-			if set_rotation:
+			if rotation_enabled:
 				_camera_2d.rotation_interpolate_target = target.global_rotation
 		elif is_attached_to_3d_camera():
-			if set_position:
+			if position_enabled:
 				_camera_3d.position_interpolate_target = target.global_position
 			
-			if set_rotation:
+			if rotation_enabled:
 				_camera_3d.basis_interpolate_target = target.global_basis
 
 func _get_property_list() -> Array[Dictionary]:
@@ -57,9 +66,6 @@ func _get_property_list() -> Array[Dictionary]:
 var _camera_2d : RubiconInterpolatedCamera2D
 var _camera_3d : RubiconInterpolatedCamera3D
 
-func _init() -> void:
-	set_process_internal(true)
-
 func is_attached_to_2d_camera() -> bool:
 	return _camera_2d != null
 
@@ -68,6 +74,8 @@ func is_attached_to_3d_camera() -> bool:
 
 func _notification(what : int) -> void:
 	match what:
+		NOTIFICATION_POSTINITIALIZE:
+			set_process_internal(true)
 		NOTIFICATION_PARENTED:
 			var parent : Node = get_parent()
 			if parent is RubiconInterpolatedCamera2D:
@@ -78,17 +86,20 @@ func _notification(what : int) -> void:
 			_camera_2d = null
 			_camera_3d = null
 		NOTIFICATION_INTERNAL_PROCESS:
+			if not position_follow and not rotation_follow:
+				return
+
 			if not point_map.has(current_point) or point_map[current_point] == null:
 				return
 
 			var target : Node = point_map[current_point]
-			if set_position:
+			if position_follow:
 				if is_attached_to_2d_camera():
 					_camera_2d.position_interpolate_target = _get_2d_global_position(target)
 				elif is_attached_to_3d_camera():
 					_camera_3d.position_interpolate_target = target.global_position
 			
-			if set_rotation:
+			if rotation_follow:
 				if is_attached_to_2d_camera():
 					_camera_2d.rotation_interpolate_target = target.global_rotation
 				elif is_attached_to_3d_camera():

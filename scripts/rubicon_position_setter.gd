@@ -77,7 +77,7 @@ func is_attached_to_2d_camera() -> bool:
 func is_attached_to_3d_camera() -> bool:
 	return _camera_3d != null
 
-func _notification(what : int) -> void:
+func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_PARENTED:
 			var parent : Node = get_parent()
@@ -107,6 +107,14 @@ func _notification(what : int) -> void:
 					_camera_2d.rotation_interpolate_target = target.global_rotation
 				elif is_attached_to_3d_camera():
 					_camera_3d.basis_interpolate_target = target.global_basis
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings : PackedStringArray
+	
+	if not is_attached_to_2d_camera() and not is_attached_to_3d_camera():
+		warnings.append("This node needs to be a child of a RubiconInterpolatedCamera2D or RubiconInterpolatedCamera3D to work.")
+	
+	return warnings
 
 ## This normally isn't needed, but [Parallax2D] does geniunely change the global position of nodes.
 func _get_2d_global_position(node : Node) -> Vector2:

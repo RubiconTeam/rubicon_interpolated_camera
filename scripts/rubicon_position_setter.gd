@@ -18,19 +18,19 @@ class_name RubiconPositionSetter extends Node
 		point_map = value
 		notify_property_list_changed()
 
-@export_storage var current_point : StringName:
+@export_storage var _current_point : StringName:
 	set(value):
-		if value == current_point or not point_map.has(value) or point_map[value] == null:
+		if value == _current_point or not point_map.has(value) or point_map[value] == null:
 			return
 
 			if value == null and not point_map.values()[0] == null:
 				value = point_map.values()[0]
 
-		current_point = value
+		_current_point = value
 		set_process_internal(true)
 		notify_property_list_changed()
 
-		var target : Node = point_map[current_point]
+		var target : Node = point_map[_current_point]
 		if is_attached_to_2d_camera():
 			if position_enabled:
 				_camera_2d.position_interpolate_target = _get_2d_global_position(target)
@@ -58,7 +58,7 @@ func _get_property_list() -> Array[Dictionary]:
 		return []
 	
 	properties.append({
-		name = &"_current_point",
+		name = &"current_point",
 		hint = PROPERTY_HINT_ENUM,
 		type = TYPE_STRING_NAME,
 		usage = PROPERTY_USAGE_EDITOR,
@@ -92,10 +92,10 @@ func _notification(what: int) -> void:
 			if not position_follow and not rotation_follow:
 				return
 
-			if not point_map.has(current_point) or point_map[current_point] == null:
+			if not point_map.has(_current_point) or point_map[_current_point] == null:
 				return
 
-			var target : Node = point_map[current_point]
+			var target : Node = point_map[_current_point]
 			if position_follow:
 				if is_attached_to_2d_camera():
 					_camera_2d.position_interpolate_target = _get_2d_global_position(target)
@@ -139,14 +139,14 @@ func _get_node_2d_position(node : Node) -> Vector2:
 	return node.position
 
 func _get(property: StringName) -> Variant:
-	if property == &"_current_point":
-		return current_point
+	if property == &"current_point":
+		return _current_point
 
 	return null
 
 func _set(property: StringName, value: Variant) -> bool:
-	if property == &"_current_point":
-		current_point = value
+	if property == &"current_point":
+		_current_point = value
 		return true
 
 	return false

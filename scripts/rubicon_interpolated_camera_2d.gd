@@ -15,8 +15,8 @@ class_name RubiconInterpolatedCamera2D extends Camera2D
 
 @export_group("Zoom", "zoom_interpolate_")
 @export var zoom_interpolate_enabled: bool = true
-@export var zoom_interpolate_target: Vector2 = Vector2.ONE
-@export var zoom_interpolate_offset: Vector2 = Vector2.ZERO
+@export_custom(PROPERTY_HINT_LINK, "") var zoom_interpolate_target : Vector2 = Vector2.ONE
+@export_custom(PROPERTY_HINT_LINK, "") var zoom_interpolate_offset : Vector2 = Vector2.ZERO
 @export var zoom_interpolate_speed: float = 3.125 ## How fast the camera's zoom will return to, in px/s.
 
 func _notification(what: int) -> void:

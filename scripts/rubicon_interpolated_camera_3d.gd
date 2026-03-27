@@ -2,19 +2,19 @@
 class_name RubiconInterpolatedCamera3D extends Camera3D
 
 @export_group("Position", "position_interpolate_")
-@export var position_interpolate_enabled: bool = true
+@export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var position_interpolate_enabled: bool = true
 @export var position_interpolate_target: Vector3 = Vector3.ZERO
 @export var position_interpolate_offset: Vector3 = Vector3.ZERO
 @export var position_interpolate_speed: float = 2.4 ## How fast the camera's position will return to. 
 
 @export_group("Basis", "basis_interpolate_")
-@export var basis_interpolate_enabled: bool = true
+@export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var basis_interpolate_enabled: bool = true
 @export var basis_interpolate_target: Basis = Basis.IDENTITY ## The camera's target basis.
 @export var basis_interpolate_offset: Basis = Basis.IDENTITY
 @export var basis_interpolate_speed: float = 2.4 ## How fast the camera's basis will return to.
 
 @export_group("FOV", "fov_interpolate_")
-@export var fov_interpolate_enabled: bool = true
+@export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var fov_interpolate_enabled: bool = true
 @export var fov_interpolate_target: float = 75.0
 @export var fov_interpolate_offset: float = 0.0
 @export var fov_interpolate_speed: float = 3.125 ## How fast the camera's FOV will return to.

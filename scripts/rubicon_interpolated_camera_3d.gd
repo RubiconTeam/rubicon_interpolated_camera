@@ -2,27 +2,46 @@
 class_name RubiconInterpolatedCamera3D extends Camera3D
 
 @export_group("Position", "position_interpolate_")
+## Determines whether the camera should or should not interpolate its position to [member position_interpolate_target].
 @export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var position_interpolate_enabled: bool = true
+## The camera's target position, as a [Vector3].
 @export var position_interpolate_target: Vector3 = Vector3.ZERO
+## The camera's offset position that gets added to [member position_interpolate_target]. [member position_interpolate_smooth_offset] will determine if the offset should be smooth or immediate.
 @export var position_interpolate_offset: Vector3 = Vector3.ZERO
-@export var position_interpolate_speed: float = 2.4 ## How fast the camera's position will return to. 
+## How fast the camera's position will return to.
+@export var position_interpolate_speed: float = 2.4
+
+@export_group("Rotation (Degrees)", "rotation_interpolate_")
+## Determines whether the camera should or should not interpolate its rotation to [member rotation_interpolate_target].
+@export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var rotation_interpolate_enabled:bool = true
+## The camera's target rotation, in radians (as degrees visually).
+@export_custom(PROPERTY_HINT_RANGE, "-180,180,0.1,radians_as_degrees")  var rotation_interpolate_target: Vector3 = Vector3.ZERO
+## The camera's offset rotation that gets added to [member rotation_interpolate_target]. [member rotation_interpolate_smooth_offset] will determine if the offset should be smooth or immediate.
+@export_custom(PROPERTY_HINT_RANGE, "-180,180,0.1,radians_as_degrees")  var rotation_interpolate_offset: Vector3 = Vector3.ZERO
+## How fast the camera's rotation will return to.
+@export var rotation_interpolate_speed: float = 2.4
 
 @export_group("Basis", "basis_interpolate_")
-@export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var basis_interpolate_enabled: bool = true
+@export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var basis_interpolate_enabled: bool = false
 @export var basis_interpolate_target: Basis = Basis.IDENTITY ## The camera's target basis.
 @export var basis_interpolate_offset: Basis = Basis.IDENTITY
 @export var basis_interpolate_speed: float = 2.4 ## How fast the camera's basis will return to.
 
 @export_group("FOV", "fov_interpolate_")
+## Determines whether the camera should or should not interpolate its [member fov] to [member fov_interpolate_target].
 @export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var fov_interpolate_enabled: bool = true
+## The camera's target fov, as a [float].
 @export var fov_interpolate_target: float = 75.0
+## The camera's offset fov that gets added to [member fov_interpolate_target]. [member fov_interpolate_smooth_offset] will determine if the offset should be smooth or immediate.
 @export var fov_interpolate_offset: float = 0.0
-@export var fov_interpolate_speed: float = 3.125 ## How fast the camera's FOV will return to.
+## How fast the camera's fov will return to.
+@export var fov_interpolate_speed: float = 3.125
 
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_READY:
 			position_interpolate_target = global_position
+			rotation_interpolate_target = global_rotation_degrees
 			basis_interpolate_target = global_basis
 			fov_interpolate_target = fov
 			set_process_internal(true)
@@ -30,6 +49,14 @@ func _notification(what: int) -> void:
 			var delta : float = get_process_delta_time()
 			if position_interpolate_enabled:
 				global_position = global_position.lerp(position_interpolate_target + position_interpolate_offset, position_interpolate_speed * delta)
+			
+			if rotation_interpolate_enabled:
+				global_rotation_degrees = Vector3(
+					rad_to_deg(lerp_angle(global_rotation.x, rotation_interpolate_target.x + rotation_interpolate_offset.x, rotation_interpolate_speed * delta)),
+					rad_to_deg(lerp_angle(global_rotation.y, rotation_interpolate_target.y + rotation_interpolate_offset.y, rotation_interpolate_speed * delta)),
+					rad_to_deg(lerp_angle(global_rotation.z, rotation_interpolate_target.z + rotation_interpolate_offset.z, rotation_interpolate_speed * delta))
+				)
+				#global_rotation_degrees.lerp(rotation_interpolate_target + rotation_interpolate_offset, rotation_interpolate_speed * delta)
 			
 			if basis_interpolate_enabled:
 				global_basis = global_basis.slerp(basis_interpolate_target * basis_interpolate_offset, basis_interpolate_speed * delta)

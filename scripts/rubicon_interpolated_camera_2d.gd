@@ -2,22 +2,40 @@
 class_name RubiconInterpolatedCamera2D extends Camera2D
 
 @export_group("Position", "position_interpolate_")
+## Determines whether the camera should or should not interpolate its [member position] to [member position_interpolate_target].
 @export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var position_interpolate_enabled: bool = true
+## The camera's target position, as a [Vector2].
 @export var position_interpolate_target: Vector2 = Vector2.ZERO
+## The camera's offset position that gets added to [member position_interpolate_target]. [member position_interpolate_smooth_offset] will determine if the offset should be smooth or immediate.
 @export var position_interpolate_offset: Vector2 = Vector2.ZERO
-@export var position_interpolate_speed: float = 2.4 ## How fast the camera's position will return to, in px/s.
+## Smooths out the position offset value, same way as target. Otherwise, adds the offset to the final result.
+#@export var position_interpolate_smooth_offset: bool = true
+## How fast the camera's position will return to, in px/s.
+@export var position_interpolate_speed: float = 2.4
 
-@export_group("Rotation", "rotation_interpolate_")
+@export_group("Rotation (Degrees)", "rotation_interpolate_")
+## Determines whether the camera should or should not interpolate its [member rotation] to [member rotation_interpolate_target].
 @export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var rotation_interpolate_enabled: bool = true
-@export var rotation_interpolate_target: float = 0.0 ## The camera's target rotation, in radians.
-@export var rotation_interpolate_offset: float = 0.0
-@export var rotation_interpolate_speed: float = 2.4 ## How fast the camera's rotation will return to, in px/s.
+## The camera's target rotation, in radians (as degrees visually).
+@export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,radians_as_degrees") var rotation_interpolate_target: float = 0.0 
+## The camera's offset rotation that gets added to [member rotation_interpolate_target]. [member rotation_interpolate_smooth_offset] will determine if the offset should be smooth or immediate.
+@export_custom(PROPERTY_HINT_RANGE, "-360,360,0.1,radians_as_degrees") var rotation_interpolate_offset: float = 0.0
+## Smooths out the rotation offset value, same way as target. Otherwise, adds the offset to the final result.
+#@export var rotation_interpolate_smooth_offset: bool = true
+## How fast the camera's rotation will return to, in px/s.
+@export var rotation_interpolate_speed: float = 2.4
 
 @export_group("Zoom", "zoom_interpolate_")
+## Determines whether the camera should or should not interpolate its [member zoom] to [member zoom_interpolate_target].
 @export_custom(PROPERTY_HINT_GROUP_ENABLE, "") var zoom_interpolate_enabled: bool = true
+## The camera's target zoom, as a [Vector2].
 @export_custom(PROPERTY_HINT_LINK, "") var zoom_interpolate_target : Vector2 = Vector2.ONE
+## The camera's offset zoom that gets added to [member zoom_interpolate_target]. [member zoom_interpolate_smooth_offset] will determine if the offset should be smooth or immediate.
 @export_custom(PROPERTY_HINT_LINK, "") var zoom_interpolate_offset : Vector2 = Vector2.ZERO
-@export var zoom_interpolate_speed: float = 3.125 ## How fast the camera's zoom will return to, in px/s.
+## Smooths out the zoom offset value, same way as target. Otherwise, adds the offset to the final result.
+#@export var zoom_interpolate_smooth_offset: bool = true
+## How fast the camera's zoom will return to, in px/s.
+@export var zoom_interpolate_speed: float = 3.125
 
 func _notification(what: int) -> void:
 	match what:
@@ -30,9 +48,10 @@ func _notification(what: int) -> void:
 			var delta : float = get_process_delta_time()
 			if position_interpolate_enabled:
 				global_position = global_position.lerp(position_interpolate_target + position_interpolate_offset, position_interpolate_speed * delta)
-	
+			
 			if rotation_interpolate_enabled:
-				global_rotation = lerpf(global_rotation, rotation_interpolate_target + rotation_interpolate_offset, rotation_interpolate_speed * delta)
+				global_rotation_degrees = rad_to_deg(lerp_angle(global_rotation, rotation_interpolate_target + rotation_interpolate_offset, rotation_interpolate_speed * delta))
 			
 			if zoom_interpolate_enabled:
 				zoom = zoom.lerp(zoom_interpolate_target + zoom_interpolate_offset, zoom_interpolate_speed * delta)
+			

@@ -56,7 +56,6 @@ func _notification(what: int) -> void:
 					rad_to_deg(lerp_angle(global_rotation.y, rotation_interpolate_target.y + rotation_interpolate_offset.y, rotation_interpolate_speed * delta)),
 					rad_to_deg(lerp_angle(global_rotation.z, rotation_interpolate_target.z + rotation_interpolate_offset.z, rotation_interpolate_speed * delta))
 				)
-				#global_rotation_degrees.lerp(rotation_interpolate_target + rotation_interpolate_offset, rotation_interpolate_speed * delta)
 			
 			if basis_interpolate_enabled:
 				global_basis = global_basis.slerp(basis_interpolate_target * basis_interpolate_offset, basis_interpolate_speed * delta)

@@ -44,14 +44,30 @@ func _notification(what: int) -> void:
 			rotation_interpolate_target = global_rotation
 			zoom_interpolate_target = zoom
 			set_process_internal(true)
-		NOTIFICATION_INTERNAL_PROCESS:
-			var delta : float = get_process_delta_time()
-			if position_interpolate_enabled:
-				global_position = global_position.lerp(position_interpolate_target + position_interpolate_offset, position_interpolate_speed * delta)
-			
-			if rotation_interpolate_enabled:
-				global_rotation_degrees = rad_to_deg(lerp_angle(global_rotation, rotation_interpolate_target + rotation_interpolate_offset, rotation_interpolate_speed * delta))
-			
-			if zoom_interpolate_enabled:
-				zoom = zoom.lerp(zoom_interpolate_target + zoom_interpolate_offset, zoom_interpolate_speed * delta)
-			
+		#NOTIFICATION_INTERNAL_PROCESS:
+			#var delta : float = get_process_delta_time()
+			#if position_interpolate_enabled:
+				#global_position = global_position.lerp(position_interpolate_target + position_interpolate_offset, position_interpolate_speed * delta)
+			#
+			#if rotation_interpolate_enabled:
+				#global_rotation_degrees = rad_to_deg(lerp_angle(global_rotation, rotation_interpolate_target + rotation_interpolate_offset, rotation_interpolate_speed * delta))
+			#
+			#if zoom_interpolate_enabled:
+				#zoom = zoom.lerp(zoom_interpolate_target + zoom_interpolate_offset, zoom_interpolate_speed * delta)
+
+func _process(delta: float) -> void:
+	if position_interpolate_enabled:
+		global_position = global_position.lerp(position_interpolate_target + position_interpolate_offset, position_interpolate_speed * delta)
+	
+	if rotation_interpolate_enabled:
+		global_rotation_degrees = rad_to_deg(lerp_angle(global_rotation, rotation_interpolate_target + rotation_interpolate_offset, rotation_interpolate_speed * delta))
+	
+	if zoom_interpolate_enabled:
+		zoom = zoom.lerp(zoom_interpolate_target + zoom_interpolate_offset, zoom_interpolate_speed * delta)
+
+
+#func _set(property: StringName, value: Variant) -> bool:
+	#if property == &"enabled" and value is bool and value:
+		#print("reenabled cam")
+		#set_process_internal(true)
+	#return false

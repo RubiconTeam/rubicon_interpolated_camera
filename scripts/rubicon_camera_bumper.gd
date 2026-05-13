@@ -8,22 +8,24 @@ enum BumpTime {
 	MEASURE,
 }
 
-@export var enabled:bool = true
+@export var enabled: bool = true
 
-@export var bump_every:BumpTime = BumpTime.MEASURE:
+@export var bump_every: BumpTime = BumpTime.MEASURE:
 	set(value):
 		bump_every = value
 		set_bump_time(value)
 
-@export var bump_amount:float = 0.05
+@export_range(1, 128) var bump_interval: int = 1
 
-var _level : RubiconLevel:
+@export var bump_amount: float = 0.05
+
+var _level: RubiconLevel:
 	set(value):
 		_level = value
 		set_bump_time(bump_every)
 
-var _camera_2d : RubiconInterpolatedCamera2D
-var _camera_3d : RubiconInterpolatedCamera3D
+var _camera_2d: RubiconInterpolatedCamera2D
+var _camera_3d: RubiconInterpolatedCamera3D
 
 func _init() -> void:
 	set_process_internal(true)
@@ -34,10 +36,10 @@ func is_attached_to_2d_camera() -> bool:
 func is_attached_to_3d_camera() -> bool:
 	return _camera_3d != null
 
-func _notification(what : int) -> void:
+func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_PARENTED:
-			var parent : Node = get_parent()
+			var parent: Node = get_parent()
 			if parent is RubiconInterpolatedCamera2D:
 				_camera_2d = parent
 			elif parent is RubiconInterpolatedCamera3D:
@@ -54,7 +56,7 @@ func _notification(what : int) -> void:
 			_camera_3d = null
 			_level = null
 
-func set_bump_time(new_bump_time:BumpTime):
+func set_bump_time(new_bump_time: BumpTime):
 	if _level == null:
 		return
 	
@@ -90,7 +92,19 @@ func set_bump_time(new_bump_time:BumpTime):
 				_level.clock.measure_change.connect(camera_bump)
 
 func camera_bump() -> void:
+	var cur_time: int = floorf(get_cur_time_value())
+	if cur_time % bump_interval != 0:
+		return
+	
 	if _camera_2d != null:
 		_camera_2d.zoom += Vector2(bump_amount, bump_amount)
 	if _camera_3d != null:
 		_camera_3d.fov += bump_amount
+
+func get_cur_time_value() -> float:
+	match bump_every:
+		BumpTime.BEAT:
+			return _level.clock.time_beat
+		BumpTime.STEP:
+			return _level.clock.time_step
+	return _level.clock.time_measure
